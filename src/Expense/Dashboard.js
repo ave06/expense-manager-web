@@ -6,9 +6,20 @@ import { Box, Button, TableBody, TableCell, TableContainer, TableHead, TablePagi
 import AapBar from '../AapBar/AapBar';
 import Footer from '../Footer/Footer';
 import AddExpense from './AddExpense';
+import { useDispatch, useSelector } from 'react-redux';
+import { logoutUser } from '../redux/actions';
+import MenuListComposition from '../AapBar/MenuListComposition';
+import LoggedAapBar from '../AapBar/LoggedAapBar';
+import { format } from 'date-fns';
+import CreateCategory from '../Category/CreateCategory';
 
 
 const Dashboard = () => {
+    const user = useSelector((state) => state.user);
+    const dispatch = useDispatch();
+    const handleLogout = () => {
+        dispatch(logoutUser());
+    };
     function createData(id, amount, attachment, categoryid, createdat, description, directionid, modifiedby, updatedat, userid) {
         return { id, amount, attachment, categoryid, createdat, description, directionid, modifiedby, updatedat, userid };
     }
@@ -26,7 +37,8 @@ const Dashboard = () => {
         setPage(0);
     }
     async function callGetexpenseMethod() {
-        const response = await fetch("http://localhost:4000/expense/getExpenseByUserId/3", {
+        // const response = await fetch("http://localhost:4000/expense/getExpenseByUserId/3", {
+        const response = await fetch('http://localhost:4000/expense/getJoinExpense/', {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -36,20 +48,36 @@ const Dashboard = () => {
         const info = await (response.json());
         const formattedData = info.data;
         setExpensesinfo(formattedData.map((e) => {
-            return createData(e.id, e.amount, e.attachment, e.categoryid, e.createdat, e.description, e.directionid, e.modifiedby, e.updatedat, e.userid)
+            const originalDate = new Date(e.createdat);
+            const formattedDate = format(originalDate, 'dd-MM-yy HH:mm:ss');
+            return createData(e.id, e.amount, e.attachment, e.category.categoryname, formattedDate, e.description, e.direction.directionname, e.modifiedby, e.updatedat, e.userid)
 
         }));
-
     }
     React.useEffect(() => {
         callGetexpenseMethod()
     }, []);
     return (
         <div>
-            <AapBar></AapBar>
+            <LoggedAapBar />
+
+            {/* <MenuListComposition /> */}
+
+
             <Typography variant='h4' sx={{ margin: 2 }} gutterBottom>My Expenses</Typography>
             <div>
+                {/* <CreateCategory /> */}
                 <AddExpense></AddExpense>
+            </div>
+            <div>
+                {user ? (
+                    <div>
+                        <p> Welcome , {user.username}</p>
+                        {/* <button onClick={handleLogout}>Logout</button> */}
+                    </div>) : (
+                    <p>You are not logged</p>
+
+                )}
             </div>
             <Paper>
                 <TableContainer component={Paper}>
@@ -72,12 +100,13 @@ const Dashboard = () => {
                                 (
                                     <TableRow key={row.id}>
                                         <TableCell>{row.description}</TableCell>
-                                        {/* <TableCell>{row.attachment}</TableCell> */}
+                                        <TableCell>{row.amount}</TableCell>
                                         <TableCell>{row.categoryid}</TableCell>
-                                        <TableCell>{row.createdat}</TableCell>
+                                        {/* <TableCell>{row.createdat}</TableCell> */}
                                         <TableCell>{row.directionid}</TableCell>
+                                        <TableCell>{row.createdat}</TableCell>
                                         <TableCell>{row.modifiedby}</TableCell>
-                                        <TableCell>{row.description}</TableCell>
+                                        {/* <TableCell>{row.description}</TableCell> */}
                                         {/* <TableCell>{row.userid}</TableCell> */}
                                     </TableRow>
                                 ))

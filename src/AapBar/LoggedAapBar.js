@@ -56,7 +56,7 @@ function ChildModal() {
   );
 }
 
-export default function AapBar() {
+export default function LoggedAapBar() {
   const navigate = useNavigate();
   const navigatetoRedux = () => {
     navigate('/redux');
@@ -92,49 +92,12 @@ export default function AapBar() {
             Expense Manager
           </Typography>
 
+          
+          
           <div>
-            <Button color="inherit" onClick={handleOpen}>
-              Sign Up
-            </Button>
-            <Modal
-              open={open}
-              onClose={handleClose}
-              aria-labelledby="modal-modal-title"
-              aria-describedby="modal-modal-description"
-            >
-              <Box sx={style}>
-                <SignUp onSignupSuccessfull={onSignupSuccessfullHandler}></SignUp>
-                {/* <ChildModal></ChildModal> */}
-              </Box>
-            </Modal>
-          </div>
-
-          <div>
-            <Button color="inherit" onClick={handleOpenLogin}>
-              Login
-            </Button>
-            <Modal
-              open={openLogin}
-              onClose={handleCloseLogin}
-              aria-labelledby="modal-modal-title"
-              aria-describedby="modal-modal-description"
-            >
-              <Box sx={style}>
-                <UserSignIn></UserSignIn>
-              </Box>
-            </Modal>
-
-          </div>
-          {/* <div>
-          <Button color="inherit" onClick={navigatetoRedux}>
-             redux
-            </Button>
-           
-          </div> */}
-          {/* <div>
        <MenuListComposition />
            
-          </div> */}
+          </div>
         </Toolbar>
       </AppBar>
     </Box>

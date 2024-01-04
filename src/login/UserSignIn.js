@@ -14,7 +14,8 @@ import Container from '@mui/material/Container';
 import { useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
+import { useDispatch } from 'react-redux';
+import { loginUser } from '../redux/actions';
 
 function Copyright(props) {
   return (
@@ -34,46 +35,51 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function UserSignIn() {
-    const navigate = useNavigate();
-    const [username, setUsername] = useState();
-    const [password, setPassword] = useState();
-    const handleSubmit = (event) => {
-      event.preventDefault();
-      const dataForm = new FormData(event.currentTarget);
-      setPassword(dataForm.get("password"));
-      setUsername(dataForm.get("email"));
-      console.log(password + " " + username);
-      callLoginMethod();
-    };
-  
-    async function callLoginMethod() {
-      try {
-        const jsonString = { username: username, password: password };
-        console.log(jsonString);
-        const response = await fetch("http://localhost:4000/users/login/", {
-          method: "POST",
-          body: JSON.stringify(jsonString),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-      //   const response = await axios({
-      //     url: "http://localhost:4000/users/login/",
-      //     method: "POST",
-      //     body: JSON.stringify(jsonString),
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     }
-      // });
-        const result = await response.json();
-if(result.message === "login successfull"){
-    navigate('/Dashboard', {state:{id:jsonString.username}},{replace: true});
-}
-        console.log(result.message);
-      } catch (error) {
-        console.log(error);
+  const dispatch = useDispatch ();
+  const navigate = useNavigate();
+  const [username, setUsername] = useState();
+  const [password, setPassword] = useState();
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const dataForm = new FormData(event.currentTarget);
+    setPassword(dataForm.get("password"));
+    setUsername(dataForm.get("email"));
+    console.log(password + " " + username);
+    const email = dataForm.get("email");
+    const pass = dataForm.get("password");
+    callLoginMethod(email, pass);
+  };
+
+  async function callLoginMethod(email, pass) {
+    try {
+      
+      const jsonString = { username: email, password: pass };
+      console.log(jsonString);
+      const response = await fetch("http://localhost:4000/users/login/", {
+        method: "POST",
+        body: JSON.stringify(jsonString),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const result = await response.json();
+      const userid = result.userid;
+      const username = result.username;
+      if (result.message === "login successfull") {
+        const user = {
+          id:userid,
+          name:email,
+          username:username
+        };
+       console.log("line74+"+user.id+user.name+user.username)
+        dispatch(loginUser(user));
+        navigate('/Dashboard', { state: { id: jsonString.username } }, { replace: true });
       }
-    };
+     
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <ThemeProvider theme={defaultTheme}>
